@@ -1,0 +1,107 @@
+<html>
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> 
+      Real Time Database Map
+    </title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+  </head>
+  <body>
+
+    <div id="map"></div>
+    <script>
+      var mymap = L.map('map').setView([8.230137, 484.241724], 14); 
+        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+        maxZoom: 18,
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        id: 'mapbox/streets-v11',
+        tileSize: 512,
+        zoomOffset: -1
+        }).addTo(mymap);
+    </script>
+
+    <div id="login-box">
+      <div class="left">
+        <h1>Data Gatherer</h1>
+        <input type="text" id="Barangay" name="Barangay" placeholder="Barangay" />
+        <input type="text" id="longitude" name="longitude" placeholder="Longitude" />
+        <input type="text" id="latitude" name="latitude" placeholder="Latitude" />
+        <input type="submit" id="saveData" name="signup_submit" value="add" />
+    </div>
+    
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
+      import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyA4myV7wAp5hNpjBWT2URSB3k5i-PV-cUc",
+        authDomain: "ilgempstat.firebaseapp.com",
+        databaseURL: "https://ilgempstat-default-rtdb.firebaseio.com",
+        projectId: "ilgempstat",
+        storageBucket: "ilgempstat.appspot.com",
+        messagingSenderId: "239426682732",
+        appId: "1:239426682732:web:21f0f7562aaa4495c47d49",
+        measurementId: "G-41V3TF1ZXQ"
+      };
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      
+      saveData.addEventListener('click',(e) => {
+        var Barangay = document.getElementById('Barangay').value;
+        var longitude = document.getElementById('longitude').value;
+        var latitude = document.getElementById('latitude').value;
+
+        set(ref(database, 'Barangays/'+ Barangay), {
+        
+        Barangay: Barangay, 
+        Longitude: longitude,
+        Latitude : latitude
+      });
+      alert('saved');
+      });
+
+      const db = getDatabase();
+
+      function getLong(){
+        get(child(dbref, "Barangays/")).then((snapshot)=>{
+          if(snapsnot.exist()){
+            snapshot.val().longitude;
+          }
+          else{
+            alert("No data");
+          }
+        })
+        .catch((error)=>{
+          aleart("not success", +error);
+        })
+      }
+      function getLat(){
+        get(child(dbref, "Barangays/")).then((snapshot)=>{
+          if(snapsnot.exist()){
+            snapshot.val().latitude;
+          }
+          else{
+            alert("No data");
+          }
+        })
+        .catch((error)=>{
+          aleart("not success", +error);
+        })
+      }
+      
+      var marker = L.marker([8.230137,484.241724]).addTo(mymap);
+</script>
+</html>
