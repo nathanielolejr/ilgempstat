@@ -209,6 +209,15 @@ function showGeoJson(map, iligan, geoJsonFile = "PH10/PH10.json"){
         "properties" :{
           "name": i,
           "employment": Math.floor(Math.random() * 1000),
+          "description" : 
+            "<h2>BARANGAY NAME</h2>" +
+            "<table><thead><tr><th>Status</th><th>Counter</th></tr></thead>" +
+            "<tbody>"+
+            "<tr><td>Contractual</td><td>"+ Math.floor(Math.random() * 1000) +"</td></tr>"+
+            "<tr><td>Regular</td><td>"+ Math.floor(Math.random() * 1000) +"</td></tr>"+
+            "<tr><td>Freelancer</td><td>"+ Math.floor(Math.random() * 1000) +"</td></tr>"+
+            "<tr><td>Part time</td><td>"+ Math.floor(Math.random() * 1000) +"</td></tr>" +
+            "</tbody></table>"
         },
         "geometry" : geo,
       }
@@ -243,12 +252,13 @@ function showGeoJson(map, iligan, geoJsonFile = "PH10/PH10.json"){
               geoJson.resetStyle(e.target);
               info.update();
             },
-            click: function(e){
-              map.fitBounds(e.target.getBounds());
-            }
+            
           });
         },
-        }) 
+        })
+        .bindPopup(function (layer){
+          return layer.feature.properties.description;
+        })
         .addTo(map);
 
 
