@@ -92,13 +92,6 @@ function buildMap(locations = []){
 
   // GeoJson
   
-  
-  // Get a reference to the storage service, which is used to create references in your storage bucket
-  const storage = getStorage();
-  // console.log(storage);
-
-  // Create a reference from a Google Cloud Storage URI
-  const gsReference = storageRef(storage, 'gs://ilgempstat.appspot.com/PH10.json');
   /**
    *  if you want to test it locally
    * 
@@ -115,7 +108,7 @@ function buildMap(locations = []){
    *  
    */
 
-  var online = false;
+  var online = true;
 
   var ilg = [
     835,
@@ -144,7 +137,14 @@ function buildMap(locations = []){
 
 
   if(online){
-    getDownloadURL(storageRef(storage, 'gs://ilgempstat.appspot.com/PH10.json'))
+    // Get a reference to the storage service, which is used to create references in your storage bucket
+    const storage = getStorage();
+    // console.log(storage);
+
+    // Create a reference from a Google Cloud Storage URI
+    const gsReference = storageRef(storage, 'gs://ilgempstat.appspot.com/PH10.json');
+
+    getDownloadURL(gsReference)
     .then((data) => {
       var geoJsonFilePath = data;
   
@@ -191,6 +191,7 @@ function buildMap(locations = []){
       // Handle any errors
       console.log(error);
     });
+  
   }else{
     var geoJsonFilePath = "PH10/PH10.json";
   
