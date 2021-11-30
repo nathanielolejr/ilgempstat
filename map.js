@@ -40,12 +40,13 @@ const dbRef = ref(db, 'Barangays/');
 onValue(dbRef,  function(snapshot){
   const data =  snapshot.val();
   // rebuild the map
-  buildMap();
+  // console.log(data);
+  buildMap(data);
 });
 
 
 
-function buildMap(locations = []){
+function buildMap(realTimeData){
   // check if the map is already initiated or not
   var container = L.DomUtil.get('map');
   if(container != null){
@@ -82,32 +83,54 @@ function buildMap(locations = []){
    *  
    */
 
-  var online = true;
+  var online = false;
 
-  var ilg = [
-    835,
-    648, 616,
-    602, 605,
-    594, 599,
-    583, 604,
-    600, 847,
-    615, 611,
-    853, 671,
-    606, 1944,
-    2010, 584,
-    582, 580,
-    608, 587,
-    586, 862,
-    581, 607,
-    563, 603,
-    588, 673,
-    579, 597,
-    595, 596,
-    598, 593,
-    585, 589,
-    614, 825,
-    601, 610,
-  ];
+  var ilg = {
+    590:{"name":"Rogongon", "density":39.08}, 
+    612:{"name":"Panoroganan", "density":37.21},
+    609:{"name":"Kalilangan", "density":56.59}, 
+    601:{"name":"Dulag", "density":83.93},
+    610:{"name":"Lanipao", "density":352.1}, 
+    587:{"name":"Mandulog", "density":371.5},
+    589:{"name":"Puga-an", "density":286.2}, 
+    595:{"name":"Tipanoy", "density":1354},
+    579:{"name":"Abuno", "density":797.6}, 
+    597:{"name":"Tominobo Upper", "density":530.9},
+    607:{"name":"Ditucalan", "density":791.7}, 
+    581:{"name":"Buru-un", "density":2790},
+    586:{"name":"Mainit", "density":111.1}, 
+    608:{"name":"Hindang", "density":92.78},
+    580:{"name":"Bunawan", "density":153.9}, 
+    582:{"name":"Dalipuga", "density":1356},
+    1944:{"name":"Kiwalan", "density":1010},
+    584:{"name":"Kabacsanan", "density":200.3},
+    606:{"name":"Acmac", "density":6580}, 
+    2010:{"name":"Bonbonon", "density":330.9},
+    862:{"name":"Digkilaan", "density":168.7}, 
+    588:{"name":"Maria Cristina", "density":2396},
+    673:{"name":"Suarez", "density":3260}, 
+    596:{"name":"Tominobo Proper", "density":4404},
+    603:{"name":"Santa Elena", "density":3013}, 
+    598:{"name":"Tubod", "density":9536},
+    614:{"name":"Ubaldo Laya", "density":4555},
+    593:{"name":"Tambacan", "density":35122},
+    585:{"name":"Mahayhay", "density":16203}, 
+    847:{"name":"Palao", "density":5579},
+    616:{"name":"Villa Verde", "density":15840},
+    648:{"name":"Saray-Tibanga", "density":17097},
+    835:{"name":"Poblacion", "density":10135}, 
+    602:{"name":"San Miguel", "density":7555},
+    605:{"name":"Tibanga", "density":15326}, 
+    599:{"name":"Bagong Silang", "density":14740},
+    600:{"name":"Del Carmen", "density":5230}, 
+    611:{"name":"Luinab", "density":4117},
+    853:{"name":"Santa Filomena", "density":3585}, 
+    671:{"name":"San Roque", "density":2907},
+    615:{"name":"Upper Hinaplanon", "density":4401}, 
+    583:{"name":"Hinaplanon", "density":5315},
+    604:{"name":"Santiago", "density":9366}, 
+    594:{"name":"Santo Rosario", "density":5899},
+  };
 
   if(online){
     // Get a reference to the storage service, which is used to create references in your storage bucket
@@ -118,42 +141,52 @@ function buildMap(locations = []){
     const gsReference = storageRef(storage, "gs://ilgempstat.appspot.com/PH10.json");
 
     getDownloadURL(gsReference)
-    .then((data) => {
-      showGeoJson(mymap, ilg, data);
+    .then((geoJsonData) => {
+      showGeoJson(mymap, ilg, realTimeData, geoJsonData);
     })
     .catch((error) => {
       // Handle any errors
       console.log(error);
     });
   }else{
-    showGeoJson(mymap, ilg);
+    showGeoJson(mymap, ilg, realTimeData);
   } 
 }
 
+// choropleth color scheme
 function getColor(value) {
-  return value > 1000 ? '#800026' :
-         value > 500  ? '#BD0026' :
-         value > 200  ? '#E31A1C' :
-         value > 100  ? '#FC4E2A' :
-         value > 50   ? '#FD8D3C' :
-         value > 20   ? '#FEB24C' :
-         value > 10   ? '#FED976' :
-                    '#FFEDA0';
+  // 1000+      : #800026
+  // 500 - 1000 : #BD0026
+  // 200 - 500  : #E31A1C
+  // 100 - 200  : #FC4E2A
+  // 50 - 100   : #FD8D3C
+  // 20 - 50    : #FEB24C
+  // 10 - 20    : #FED976
+  // 0 - 10     : #FFEDA0
+
+  return value > 1000 ? '#800026' : 
+         value > 500  ? '#BD0026' : 
+         value > 200  ? '#E31A1C' : 
+         value > 100  ? '#FC4E2A' : 
+         value > 50   ? '#FD8D3C' : 
+         value > 20   ? '#FEB24C' : 
+         value > 10   ? '#FED976' : 
+                    '#ffffff00'; 
 }
 
 function style(feature) {
   return {
-      fillColor: getColor(feature.properties.employment),
+      fillColor: getColor(feature.properties.employement),
       weight: 2,
       opacity: 1,
-      color: 'white',
+      color: 'black', // border color
       dashArray: '3',
       fillOpacity: 0.7
   };
 }
 
 
-function showGeoJson(map, iligan, geoJsonFile = "PH10/PH10.json"){
+function showGeoJson(map, iligan, realTimeData, geoJsonFile = "PH10/PH10.json"){
   var getGeoJson = $.getJSON(geoJsonFile, function(json) {
     var geometries = json.geometries;
 
@@ -169,8 +202,9 @@ function showGeoJson(map, iligan, geoJsonFile = "PH10/PH10.json"){
     // method that we will use to update the control based on feature properties 
     // passed
     info.update = function (props) {
+      console.log(props);
       this._div.innerHTML = '<h4>Employment Status Per Barangay in Iligan City</h4>' +  (props ?
-          '<b>' + props.name + '</b><br />' + props.employment + ' employed / mi<sup>2</sup>'
+          '<b>' + props.name + '</b><br />Density: ' + props.density + '/ km<sup>2</sup>'
           : 'Hover over a state');
     };
 
@@ -196,27 +230,44 @@ function showGeoJson(map, iligan, geoJsonFile = "PH10/PH10.json"){
     };
 
     legend.addTo(map);
+    
+    for (var i in iligan) {
 
-    for (let index = 0; index < iligan.length ; index++) {
-
-      const i = iligan[index];
-
+      const barangay = iligan[i];
+      
       const geo = geometries[i];
 
+      var fbBarangayData = {
+        "Contractual" : 0,
+        "Regular" : 0,
+        "Freelancer" : 0,
+        "PartTimer" : 0,
+      };
+      
+      for(var b in realTimeData){
+        let data = realTimeData[b];
+        if(data.Barangay.toLowerCase() == barangay.name.toLowerCase()){
+          fbBarangayData = realTimeData[b];
+          break
+        }
+      }
+
+      const totalEmployement = parseInt(fbBarangayData.Contractual) + parseInt(fbBarangayData.Regular) + parseInt(fbBarangayData.Freelancer) + parseInt(fbBarangayData.PartTimer);
       // GeoJson Feature
       const geoJsonFeature = {
         "type": "Feature",
         "properties" :{
-          "name": i,
-          "employment": Math.floor(Math.random() * 1000),
+          "name": barangay.name,
+          "density": barangay.density,
+          "employement": totalEmployement,
           "description" : 
-            "<h2>BARANGAY NAME</h2>" +
+            "<h2>"+ barangay.name +"</h2>" +
             "<table><thead><tr><th>Status</th><th>Counter</th></tr></thead>" +
             "<tbody>"+
-            "<tr><td>Contractual</td><td>"+ Math.floor(Math.random() * 1000) +"</td></tr>"+
-            "<tr><td>Regular</td><td>"+ Math.floor(Math.random() * 1000) +"</td></tr>"+
-            "<tr><td>Freelancer</td><td>"+ Math.floor(Math.random() * 1000) +"</td></tr>"+
-            "<tr><td>Part time</td><td>"+ Math.floor(Math.random() * 1000) +"</td></tr>" +
+            "<tr><td>Contractual</td><td>"+ fbBarangayData.Contractual +"</td></tr>"+
+            "<tr><td>Regular</td><td>"+ fbBarangayData.Regular +"</td></tr>"+
+            "<tr><td>Freelancer</td><td>"+ fbBarangayData.Freelancer +"</td></tr>"+
+            "<tr><td>Part time</td><td>"+ fbBarangayData.PartTimer +"</td></tr>" +
             "</tbody></table>"
         },
         "geometry" : geo,
@@ -226,9 +277,9 @@ function showGeoJson(map, iligan, geoJsonFile = "PH10/PH10.json"){
         color: "#808080",
         fill: true,
       }
-
-      
-
+  
+        
+  
       var geoJson = L.geoJSON(geoJsonFeature, {
         style: style,
         onEachFeature: function(feature, layer){
@@ -237,7 +288,7 @@ function showGeoJson(map, iligan, geoJsonFile = "PH10/PH10.json"){
               var layer = e.target;
               layer.setStyle({
                   weight: 5,
-                  color: "#316B83",
+                  color: "#fff",
                   dashArray: '',
                   fillOpacity: 0.7
               });
@@ -260,10 +311,6 @@ function showGeoJson(map, iligan, geoJsonFile = "PH10/PH10.json"){
           return layer.feature.properties.description;
         })
         .addTo(map);
-
-
-
-
     }
   });
 }
