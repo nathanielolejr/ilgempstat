@@ -202,7 +202,7 @@ function showGeoJson(map, iligan, realTimeData, geoJsonFile = "PH10/PH10.json"){
     // method that we will use to update the control based on feature properties 
     // passed
     info.update = function (props) {
-      console.log(props);
+      // console.log(props);
       this._div.innerHTML = '<h4>Employment Status Per Barangay in Iligan City</h4>' +  (props ?
           '<b>' + props.name + '</b><br />Density: ' + props.density + '/ km<sup>2</sup>'
           : 'Hover over a state');
@@ -288,7 +288,7 @@ function showGeoJson(map, iligan, realTimeData, geoJsonFile = "PH10/PH10.json"){
               var layer = e.target;
               layer.setStyle({
                   weight: 5,
-                  color: "#fff",
+                  color: "#000",
                   dashArray: '',
                   fillOpacity: 0.7
               });
